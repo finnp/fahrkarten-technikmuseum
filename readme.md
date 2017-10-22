@@ -1,7 +1,7 @@
+# Fahrkarten des Deutschen Technikmuseums
 
-idea: reconstruct the rectangular sheet -> remove the grid
+Trying to detect historical rail tickets on a piece of paper. (Part of https://codingdavinci.de/)
 
-exposure max
-contrast max
-(shadows max)
-saturation min
+## Data
+
+[Rail tickets from the collection of the Deutsches Technikmuseum](https://commons.wikimedia.org/wiki/Category:Rail_tickets_from_the_collection_of_the_Deutsches_Technikmuseum)
