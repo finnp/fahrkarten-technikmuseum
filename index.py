@@ -2,7 +2,7 @@ import cv2, numpy as np
 import sys
 import imutils
 
-retr_type = cv2.RETR_EXTERNAL # cv2.RETR_LIST
+retr_type = cv2.RETR_LIST
 contour_algorithm = cv2.CHAIN_APPROX_TC89_KCOS # cv2.CHAIN_APPROX_SIMPLE
 
 
