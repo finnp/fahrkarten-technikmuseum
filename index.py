@@ -8,24 +8,28 @@ contour_algorithm = cv2.CHAIN_APPROX_TC89_KCOS
 
 input_dir = 'img'
 output_dir = 'output'
+border = 30
 
-def find_contours (img, a, color):
+def find_tickets (img, a):
     _, contours, _ = cv2.findContours(a.copy(), retr_type, contour_algorithm)
     contours = filter(lambda cont: cv2.contourArea(cont) > 400000, contours) # 20.000 to get more infor
 
     rects = []
     for cont in contours:
-        rect = cv2.approxPolyDP(cont, 40, True).copy().reshape(-1, 2)
-        rect = cv2.convexHull(rect)
-        if (len(rect) > 15): continue # possibly not needed when comparing the areas
-        area = cv2.contourArea(rect)
-        x,y,width,height = cv2.boundingRect(rect)
+        polygon = cv2.approxPolyDP(cont, 40, True).copy().reshape(-1, 2)
+        polygon = cv2.convexHull(polygon)
+        if (len(polygon) > 15): continue # possibly not needed when comparing the areas
+        area = cv2.contourArea(polygon)
+        rect = cv2.boundingRect(polygon)
+        x,y,width,height = rect
+        if (width > 1.8*height or height > 1.8*width): continue # unusual shape
         rect_area = width * height
         area_diff = abs(rect_area - area)
         if (area_diff > 60000): continue
         rects.append(rect)
+    return rects
 
-    cv2.drawContours(img, rects,-1,color,10)
+
 
 def process_image(file_name):
     original = cv2.imread(input_dir + '/' + file_name)
@@ -49,10 +53,18 @@ def process_image(file_name):
 
     edges = cv2.Canny(rough_erosion, 0, 85, apertureSize=3)
 
-    find_contours(original, erosion, (0,255,0))
-    find_contours(original, edges, (0,0,255))
+    # tickets1 = find_tickets(original, erosion)
+    tickets2 = find_tickets(original, edges)
 
-    cv2.imwrite(output_dir + '/' + file_name, original)
+    for index, ticket in enumerate(tickets2):
+        x,y,w,h = ticket
+        cropped = original[y - border: y + h + border, x - border: x + w + border]
+
+        file_without_ending = file_name[:-len('.jpg')]
+
+        output_filename = output_dir + '/' + file_without_ending + '-' + str(index) + '.jpg'
+
+        cv2.imwrite(output_filename, cropped)
 
 files = os.listdir(input_dir)
 

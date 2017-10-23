@@ -35,4 +35,6 @@ for image in images:
 
 print(str(missing_count), ' are missing')
 print(str(corrupt_count), 'corrupted files deleted')
-print('additional files:', existing_files)
+print('deleting additional files:', existing_files)
+for file_name in existing_files:
+    os.remove(path + '/' + file_name)
