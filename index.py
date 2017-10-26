@@ -2,6 +2,7 @@ import cv2, numpy as np
 import sys
 import imutils
 import os
+import json
 
 retr_type = cv2.RETR_LIST
 contour_algorithm = cv2.CHAIN_APPROX_TC89_KCOS
@@ -9,6 +10,7 @@ contour_algorithm = cv2.CHAIN_APPROX_TC89_KCOS
 input_dir = 'img'
 output_dir = 'output'
 border = 30
+image_type = 'jpg'
 
 def find_tickets (img, a):
     _, contours, _ = cv2.findContours(a.copy(), retr_type, contour_algorithm)
@@ -41,10 +43,11 @@ def process_image(file_name):
 
     _, binary = cv2.threshold(img, thresh, maxValue, cv2.THRESH_BINARY)
 
-    smallkernel = np.ones((5,5),np.uint8)
-    dilation = cv2.dilate(binary,smallkernel,iterations = 1)
     kernel = np.ones((11,11),np.uint8)
-    erosion = cv2.erode(dilation,kernel,iterations = 1)
+    # smallkernel = np.ones((5,5),np.uint8)
+    # dilation = cv2.dilate(binary,smallkernel,iterations = 1)
+    # erosion = cv2.erode(dilation,kernel,iterations = 1)
+    # tickets1 = find_tickets(original, erosion)
 
 
     rough_kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(40,40))
@@ -53,20 +56,29 @@ def process_image(file_name):
 
     edges = cv2.Canny(rough_erosion, 0, 85, apertureSize=3)
 
-    # tickets1 = find_tickets(original, erosion)
     tickets2 = find_tickets(original, edges)
 
     for index, ticket in enumerate(tickets2):
         x,y,w,h = ticket
         cropped = original[y - border: y + h + border, x - border: x + w + border]
+        metadata = {
+            'x': x,
+            'y': y,
+            'width': w,
+            'height': h,
+            'tableau': file_name
+        }
 
-        file_without_ending = file_name[:-len('.jpg')]
+        file_without_ending = file_name[:-len('.' + image_type)]
 
-        output_filename = output_dir + '/' + file_without_ending + '-' + str(index) + '.jpg'
+        output_filename = output_dir + '/' + file_without_ending + '-' + str(index)
 
-        cv2.imwrite(output_filename, cropped)
+        with open(output_filename + '.json', 'w') as fp:
+            json.dump(metadata, fp)
+        cv2.imwrite(output_filename  + '.jpg', cropped)
 
 files = os.listdir(input_dir)
+files = list(filter(lambda f: f[-len(image_type):] == 'jpg', files))
 
 for file_name in files:
     print('processing', file_name)
