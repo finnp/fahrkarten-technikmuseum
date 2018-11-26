@@ -59,12 +59,33 @@ steps = [
     canny
 ]
 
+def calculate_distance(x1, y1, x2, y2):
+    return (x2 - x1)**2 + (y2 - y1)**2
+
 def find_tickets(img):
     for step in steps:
         img = step(img)
 
     (rects, contours) = find_contours(img)
-    return rects
+
+    for ticket_a in rects:
+        x1, y1, w1, h1 = ticket_a
+        for ticket_b in rects:
+            x2, y2, w2, h2 = ticket_b
+            distance = calculate_distance(x1, y1, x2, y2)
+            if (distance < 10000):
+                rects.remove(ticket_b)
+
+    tickets = []
+    for ticket in rects:
+        x,y,w,h = ticket
+        tickets.append({
+            'x': x,
+            'y': y,
+            'width': w,
+            'height': h,
+        })
+    return tickets
 
 
 def debug_tickets(original, img):

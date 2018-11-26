@@ -1,0 +1,6 @@
+fahrkarten
+__pycache__
+.git
+img
+output
+*.json

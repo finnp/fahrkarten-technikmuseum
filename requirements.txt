@@ -1,0 +1,9 @@
+aiofiles==0.4.0
+httptools==0.0.11
+multidict==4.5.1
+numpy==1.15.4
+opencv-python==3.4.3.18
+sanic==0.8.3
+ujson==1.35
+uvloop==0.11.3
+websockets==5.0.1

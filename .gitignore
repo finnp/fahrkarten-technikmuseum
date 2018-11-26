@@ -1,3 +1,6 @@
 output
 img/*
 .DS_Store
+*.jpg
+fahrkarten
+__pycache__
