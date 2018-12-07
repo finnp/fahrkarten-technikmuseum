@@ -1,16 +1,18 @@
 from sanic import Sanic
 from sanic.response import json, text
 from find_tickets import find_tickets
+from sanic_cors import CORS
 import cv2
 import numpy as np
 
 app = Sanic()
+CORS(app)
 
 @app.route("/")
 async def test(request):
     return text("Usage: curl -X POST <server>/findtickets -F 'data=@test.jpg'. Returns a list of found tickets")
 
-@app.route("findtickets", methods=['POST'])
+@app.route("findtickets", methods=['POST', 'OPTIONS'])
 async def ticket(request):
     img_str = request.files['data'][0].body
     arr = np.frombuffer(img_str, np.uint8)
